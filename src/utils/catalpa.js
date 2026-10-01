@@ -16,12 +16,8 @@ function renderInline(text) {
 }
 
 function listTagFor(line) {
-  if (/^\s*[-*+]\s+/.test(line)) {
-    return 'ul'
-  }
-  if (/^\s*\d+\.\s+/.test(line)) {
-    return 'ol'
-  }
+  if (/^\s*[-*+]\s+/.test(line)) return 'ul'
+  if (/^\s*\d+\.\s+/.test(line)) return 'ol'
   return ''
 }
 
@@ -29,14 +25,15 @@ function stripListPrefix(line) {
   return line.replace(/^\s*(?:[-*+]|\d+\.)\s+/, '')
 }
 
-export function renderCatalpa(source) {
+// 渲染预览。idFor(lineIndex, headingText) 给标题注入稳定 id；
+// 不识别 {#...} 语法（它只是锚点声明）。
+export function renderCatalpa(source, { idFor } = {}) {
   const lines = source.split(/\r?\n/)
   const html = []
   let i = 0
 
   while (i < lines.length) {
-    const rawLine = lines[i]
-    const line = rawLine.trimEnd()
+    const line = lines[i].trimEnd()
 
     if (line.trim() === '') {
       i += 1
@@ -61,8 +58,12 @@ export function renderCatalpa(source) {
     if (/^#{1,6}\s+/.test(line.trim())) {
       const headingLine = line.trim()
       const level = headingLine.match(/^#{1,6}/)[0].length
-      const text = escapeHtml(headingLine.replace(/^#{1,6}\s+/, '').trim())
-      html.push(`<h${level}>${renderInline(text)}</h${level}>`)
+      let text = headingLine.replace(/^#{1,6}\s+/, '').trim()
+      text = text.replace(/\s*\{#[A-Za-z0-9_-]+\}\s*$/, '').trim()
+      const safe = escapeHtml(text)
+      const id = idFor ? idFor(i, text) : null
+      const idAttr = id ? ` id="${escapeHtml(id)}"` : ''
+      html.push(`<h${level}${idAttr} data-line="${i}">${renderInline(safe)}</h${level}>`)
       i += 1
       continue
     }
@@ -89,9 +90,7 @@ export function renderCatalpa(source) {
       const listItems = []
       while (i < lines.length) {
         const nextTag = listTagFor(lines[i])
-        if (nextTag !== currentListTag) {
-          break
-        }
+        if (nextTag !== currentListTag) break
         const text = escapeHtml(stripListPrefix(lines[i].trim()))
         listItems.push(`<li>${renderInline(text)}</li>`)
         i += 1

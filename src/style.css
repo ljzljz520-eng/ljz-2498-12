@@ -244,3 +244,62 @@ h1 {
     min-height: 44vh;
   }
 }
+
+/* 目录三栏布局与状态样式 */
+.workspace.three {
+  grid-template-columns: 260px 1fr 1fr;
+}
+
+.toc-panel {
+  min-height: 70vh;
+}
+
+.toc-panel .toc-tree {
+  padding: 10px;
+  overflow: auto;
+}
+
+.rev {
+  font-size: 0.78rem !important;
+  color: #1d4ed8 !important;
+}
+
+.save-state {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #eef6ff;
+  border: 1px solid #cfe3ff;
+  color: #1e40af;
+  font-size: 0.85rem;
+}
+.save-state.warn {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #9a3412;
+}
+
+.conflict-banner {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.85rem;
+}
+.conflict-banner ul {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.ghost-btn.primary {
+  border-color: #1d4ed8;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+@media (max-width: 1200px) {
+  .workspace.three {
+    grid-template-columns: 1fr;
+  }
+}
